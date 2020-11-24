@@ -8,12 +8,21 @@ const PageSubHeader = styled.div`
   ${theme.layout.page};
 `;
 
-function AppPageSubHeader({ title, subTitle: SubTitle }: any) {
+const Wrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+`;
+
+function AppPageSubHeader({ title, subTitle: SubTitle, action: Action }: any) {
   return (
     <PageSubHeader>
-      <Title style={{ color: '#FFFFFF' }} level={2}>
-        {title}
-      </Title>
+      <Wrapper>
+        <Title style={{ color: '#FFFFFF' }} level={2}>
+          {title}
+        </Title>
+        <Action />
+      </Wrapper>
       <Text style={{ color: '#FFFFFF' }}>
         <SubTitle />
       </Text>

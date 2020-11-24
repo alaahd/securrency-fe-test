@@ -36,7 +36,11 @@ function Base(props: any) {
     <StyledLayout>
       <StyledMastHead></StyledMastHead>
       <StyledContent>
-        <PageSubHeader title={props.title} subTitle={props.subTitle} />
+        <PageSubHeader
+          title={props.title}
+          subTitle={props.subTitle}
+          action={props.action}
+        />
         <Page>{props.children}</Page>
       </StyledContent>
     </StyledLayout>

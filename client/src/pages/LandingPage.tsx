@@ -19,6 +19,12 @@ import { getNetworkNameFromChainId } from '../utils/index';
 import { useContract } from '../hooks/useContract';
 import { ABI } from '../abis/FETestTask';
 
+// configure notifications
+notification.config({
+  duration: 120,
+  placement: 'topLeft',
+});
+
 const StyledTable = styled(Table)`
   .ant-table-container {
     padding: 0.5rem 1.25rem;
@@ -27,7 +33,10 @@ const StyledTable = styled(Table)`
 interface IProps {}
 
 const LandingPage: React.FC<IProps> = () => {
-  const { REACT_APP_CONTRACT_ADDRESS } = process.env;
+  const {
+    REACT_APP_CONTRACT_ADDRESS,
+    REACT_APP_CONTRACT_NETWORK_EXPLORER,
+  } = process.env;
 
   const [activeNetwork, setActiveNetwork] = useState<string>('');
   const [showCitizenNotesModal, setShowCitizenNotesModal] = useState<boolean>(
@@ -36,11 +45,13 @@ const LandingPage: React.FC<IProps> = () => {
   const initCitizenData = { note: '' };
   const [citizenId, setCitizenId] = useState<number>(0);
   const [citizenData, setCitizenData] = useState<any>(initCitizenData);
+  const [txIsPending, setTxIsPending] = useState<boolean>(false);
 
   const { data: results, error } = useSWR('/worker');
   const loading = !error && !results;
   const { active, account, chainId } = useWeb3React();
   const contract = useContract(REACT_APP_CONTRACT_ADDRESS, ABI);
+  console.log('🚀 ~ file: LandingPage.tsx ~ line 44 ~ contract', contract);
 
   useEffect(() => {
     if (active && account && chainId) {
@@ -63,7 +74,6 @@ const LandingPage: React.FC<IProps> = () => {
           notification.error({
             message: 'Error communicating with the smart contract !',
             description: error && error.message ? error.message : '',
-            placement: 'topLeft',
           });
         }
       })();
@@ -134,6 +144,56 @@ const LandingPage: React.FC<IProps> = () => {
     );
   };
 
+  const AddCitizenAction = () => {
+    return (
+      <Button
+        size="large"
+        disabled={(!active && !account) || txIsPending}
+        loading={txIsPending}
+        onClick={() => {
+          (async () => {
+            if (contract) {
+              try {
+                // send the transaction to blockchain
+                const { hash: txHash } = await contract.addCitizen(
+                  38,
+                  'Dubai',
+                  'Alaa Hadad',
+                  'Test adding note !'
+                );
+                notification.info({
+                  message: 'Tx sent successfully !',
+                  description: `${REACT_APP_CONTRACT_NETWORK_EXPLORER}/tx/${txHash}`,
+                });
+                setTxIsPending(true);
+
+                // wait for transaction to be mined and have 1 confirmation
+                const {
+                  blockNumber,
+                } = await contract.provider.waitForTransaction(txHash);
+                notification.info({
+                  message: 'Tx Confirmed !',
+                  description: `Tx was confirmed in block number: ${blockNumber}`,
+                });
+                setTxIsPending(false);
+              } catch (error) {
+                notification.config({
+                  duration: 5,
+                });
+                notification.error({
+                  message: error && error.message,
+                });
+                setTxIsPending(false);
+              }
+            }
+          })();
+        }}
+      >
+        {txIsPending ? 'Waiting for confirmation...' : '+ Add New Citizen'}
+      </Button>
+    );
+  };
+
   const handleCloseModal = () => {
     setShowCitizenNotesModal(false);
     setCitizenData(initCitizenData);
@@ -143,6 +203,7 @@ const LandingPage: React.FC<IProps> = () => {
     <Base
       title="List of Securrency registered citizens"
       subTitle={SubtitleComponent}
+      action={AddCitizenAction}
     >
       <StyledTable loading={loading} columns={columns} dataSource={data} />
       {/* START: Disconnect Wallet Panel */}
