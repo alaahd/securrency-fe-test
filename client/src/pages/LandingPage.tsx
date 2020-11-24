@@ -9,6 +9,7 @@ import {
   Row,
   Statistic,
   Divider,
+  notification,
 } from 'antd';
 import { useWeb3React } from '@web3-react/core';
 import useSWR from 'swr';
@@ -50,11 +51,21 @@ const LandingPage: React.FC<IProps> = () => {
   useEffect(() => {
     if (contract && citizenData && citizenData.key) {
       (async () => {
-        const citizenNote = await contract.getNoteByCitizenId(citizenData.key);
-        setCitizenData({
-          ...citizenData,
-          note: citizenNote,
-        });
+        try {
+          const citizenNote = await contract.getNoteByCitizenId(
+            citizenData.key
+          );
+          setCitizenData({
+            ...citizenData,
+            note: citizenNote,
+          });
+        } catch (error) {
+          notification.error({
+            message: 'Error communicating with the smart contract !',
+            description: error && error.message ? error.message : '',
+            placement: 'topLeft',
+          });
+        }
       })();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

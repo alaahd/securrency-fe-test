@@ -42,11 +42,13 @@ const SUSPENSE_TIME = 1500;
 const StyledHeader = styled(Header)`
   ${theme.layout.pageNoPadding};
   display: flex;
+  justify-content: space-between;
+  width: 100%;
   .connect-wallet {
     align-items: center;
     display: flex;
     justify-content: flex-end;
-    width: 100%;
+    /* width: 100%; */
   }
   .hamburger {
     color: var(--base-10);
