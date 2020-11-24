@@ -105,11 +105,11 @@ const StyledCheckCircleFilled = styled(CheckCircleFilled)`
   color: var(--green-base);
 `;
 
-function WalletSpin({ title = 'Connecting wallet...' }) {
+export function WalletSpin({ title = 'Connecting wallet...', size = 'large' }) {
   return (
     <StyledWalletSpin>
       <Space direction="vertical" size="large" align="center">
-        <Spin size="large" />
+        <Spin size={size} />
         <Typography.Title level={5}>{title}</Typography.Title>
       </Space>
     </StyledWalletSpin>
