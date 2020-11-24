@@ -1,0 +1,31 @@
+// -----------------------------------------------------------------------------
+// ANTD THEME OVERIDE
+// -----------------------------------------------------------------------------
+
+/**
+ *  Component files are imported from antd package and default.less is used to overwrite default theme
+ */
+
+@import '~antd/lib/style/themes/default.less';
+@import '~antd/dist/antd.less'; // Import Ant Design styles by less entry
+@import './styles/theme.less'; // variables to override above
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  box-sizing: border-box;
+}
+
+body {
+  padding: 0;
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
