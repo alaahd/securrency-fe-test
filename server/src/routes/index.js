@@ -24,13 +24,8 @@ router.get("/worker", async function (req, res, next) {
     projectId: INFURA_PROJECT_ID,
     projectSecret: INFURA_PROJECT_SECRET,
   });
-  console.log(
-    "🚀 ~ file: index.js ~ line 19 ~ handleRequest ~ provider",
-    provider
-  );
 
   const block = await provider.getBlockNumber();
-  console.log("🚀 ~ file: index.js ~ line 22 ~ handleRequest ~ block", block);
 
   const contract = new Contract(APP_CONTRACT_ADDRESS, abi, provider);
   console.log("Contract address: ", contract.address);

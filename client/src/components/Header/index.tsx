@@ -511,7 +511,7 @@ function AppHeader() {
             onClick={handleWalletSelectionConfirm}
             loading={walletIsActivating}
           >
-            Add Wallet
+            {walletIsActivating ? 'Connecting...' : 'Add Wallet'}
           </Button>,
         ]}
       >
