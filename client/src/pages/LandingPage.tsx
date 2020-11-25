@@ -12,6 +12,7 @@ import {
   notification,
   Form,
   Input,
+  message,
 } from 'antd';
 import { useWeb3React } from '@web3-react/core';
 import useSWR from 'swr';
@@ -58,6 +59,12 @@ const LandingPage: React.FC<IProps> = () => {
   const loading = !error && !results;
   const { active, account, chainId } = useWeb3React();
   const contract = useContract(REACT_APP_CONTRACT_ADDRESS, ABI);
+
+  useEffect(() => {
+    if (chainId && chainId !== 3) {
+      message.error('Network is not supported, please switch to Ropsten!', 8);
+    }
+  }, [chainId]);
 
   useEffect(() => {
     if (active && account && chainId) {
@@ -154,7 +161,7 @@ const LandingPage: React.FC<IProps> = () => {
     return (
       <Button
         size="large"
-        disabled={(!active && !account) || txIsPending}
+        disabled={(!active && !account) || txIsPending || chainId !== 3}
         loading={txIsPending}
         onClick={() => setShowCitizenAddModal(true)}
       >
