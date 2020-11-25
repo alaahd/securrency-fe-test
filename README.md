@@ -28,24 +28,6 @@ The API server (worker) is spun up at `http://localhost:8080`
 <br/>
 <br/>
 
-## Instructions to run the project in (Development Mode)
-
-#### Server
-
-```
-cd ./server
-cp -a .env.sample .env
-npm install && npm start
-```
-
-#### Client
-
-```
-cd ./client
-cp -a .env.sample .env
-npm install && npm start
-```
-
 ## Advanced Configuration
 
 ### Build, create, and start all in the background.
@@ -80,4 +62,22 @@ docker-compose restart nginx
 
 ```
 docker-compose ps
+```
+
+## Instructions to run the project in (Development Mode)
+
+#### Server
+
+```
+cd ./server
+cp -a .env.sample .env
+npm install && npm start
+```
+
+#### Client
+
+```
+cd ./client
+cp -a .env.sample .env
+npm install && npm start
 ```
