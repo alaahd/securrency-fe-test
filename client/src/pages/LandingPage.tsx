@@ -10,6 +10,8 @@ import {
   Statistic,
   Divider,
   notification,
+  Form,
+  Input,
 } from 'antd';
 import { useWeb3React } from '@web3-react/core';
 import useSWR from 'swr';
@@ -42,16 +44,20 @@ const LandingPage: React.FC<IProps> = () => {
   const [showCitizenNotesModal, setShowCitizenNotesModal] = useState<boolean>(
     false
   );
+  const [showCitizenAddModal, setShowCitizenAddModal] = useState<boolean>(
+    false
+  );
+  const [form] = Form.useForm();
   const initCitizenData = { note: '' };
   const [citizenId, setCitizenId] = useState<number>(0);
   const [citizenData, setCitizenData] = useState<any>(initCitizenData);
   const [txIsPending, setTxIsPending] = useState<boolean>(false);
+  const [canAddCitizen, setCanAddCitizen] = useState<boolean>(false);
 
   const { data: results, error } = useSWR('/worker');
   const loading = !error && !results;
   const { active, account, chainId } = useWeb3React();
   const contract = useContract(REACT_APP_CONTRACT_ADDRESS, ABI);
-  console.log('🚀 ~ file: LandingPage.tsx ~ line 44 ~ contract', contract);
 
   useEffect(() => {
     if (active && account && chainId) {
@@ -144,54 +150,53 @@ const LandingPage: React.FC<IProps> = () => {
     );
   };
 
-  const AddCitizenAction = () => {
+  const AddCitizenActionButton = () => {
     return (
       <Button
         size="large"
         disabled={(!active && !account) || txIsPending}
         loading={txIsPending}
-        onClick={() => {
-          (async () => {
-            if (contract) {
-              try {
-                // send the transaction to blockchain
-                const { hash: txHash } = await contract.addCitizen(
-                  38,
-                  'Dubai',
-                  'Alaa Hadad',
-                  'Test adding note !'
-                );
-                notification.info({
-                  message: 'Tx sent successfully !',
-                  description: `${REACT_APP_CONTRACT_NETWORK_EXPLORER}/tx/${txHash}`,
-                });
-                setTxIsPending(true);
-
-                // wait for transaction to be mined and have 1 confirmation
-                const {
-                  blockNumber,
-                } = await contract.provider.waitForTransaction(txHash);
-                notification.info({
-                  message: 'Tx Confirmed !',
-                  description: `Tx was confirmed in block number: ${blockNumber}`,
-                });
-                setTxIsPending(false);
-              } catch (error) {
-                notification.config({
-                  duration: 5,
-                });
-                notification.error({
-                  message: error && error.message,
-                });
-                setTxIsPending(false);
-              }
-            }
-          })();
-        }}
+        onClick={() => setShowCitizenAddModal(true)}
       >
         {txIsPending ? 'Waiting for confirmation...' : '+ Add New Citizen'}
       </Button>
     );
+  };
+  const handleAddCitizen = async ({ name, city, age, note }: any) => {
+    if (contract) {
+      try {
+        // send the transaction to blockchain
+        const { hash: txHash } = await contract.addCitizen(
+          age,
+          city,
+          name,
+          note
+        );
+        notification.info({
+          message: 'Tx sent successfully !',
+          description: `${REACT_APP_CONTRACT_NETWORK_EXPLORER}/tx/${txHash}`,
+        });
+        setTxIsPending(true);
+
+        // wait for transaction to be mined and have 1 confirmation
+        const { blockNumber } = await contract.provider.waitForTransaction(
+          txHash
+        );
+        notification.info({
+          message: 'Tx Confirmed !',
+          description: `Tx was confirmed in block number: ${blockNumber}`,
+        });
+        setTxIsPending(false);
+      } catch (error) {
+        notification.config({
+          duration: 5,
+        });
+        notification.error({
+          message: error && error.message,
+        });
+        setTxIsPending(false);
+      }
+    }
   };
 
   const handleCloseModal = () => {
@@ -203,7 +208,7 @@ const LandingPage: React.FC<IProps> = () => {
     <Base
       title="List of Securrency registered citizens"
       subTitle={SubtitleComponent}
-      action={AddCitizenAction}
+      action={AddCitizenActionButton}
     >
       <StyledTable loading={loading} columns={columns} dataSource={data} />
       {/* START: Disconnect Wallet Panel */}
@@ -262,6 +267,62 @@ const LandingPage: React.FC<IProps> = () => {
             ) : (
               <WalletSpin size="medium" title="Fetching On-Chain data..." />
             )}
+          </Col>
+        </Row>
+      </Modal>
+      {/* END: Disconnect Wallet Panel */}
+
+      {/* START: Add new citizen */}
+      <Modal
+        visible={showCitizenAddModal}
+        title="Add new citizen"
+        onCancel={() => setShowCitizenAddModal(false)}
+        transitionName="fade"
+        footer={[
+          <Button key="back" onClick={() => setShowCitizenAddModal(false)}>
+            Close
+          </Button>,
+          <Button
+            type="primary"
+            key="submit"
+            disabled={!canAddCitizen || txIsPending}
+            onClick={() => {
+              handleAddCitizen({ ...form.getFieldsValue() });
+              setShowCitizenAddModal(false);
+            }}
+          >
+            Add Citizen
+          </Button>,
+        ]}
+      >
+        <Row gutter={12}>
+          <Col span={12}>
+            <Form
+              layout="vertical"
+              form={form}
+              name="control-hooks"
+              onValuesChange={values => {
+                const { name, age, city, note } = form.getFieldsValue();
+                if (name && age && city && note) {
+                  setCanAddCitizen(true);
+                } else {
+                  setCanAddCitizen(false);
+                }
+              }}
+            >
+              <Form.Item name="name" label="Name" rules={[{ required: true }]}>
+                <Input />
+              </Form.Item>
+              <Form.Item name="age" label="Age" rules={[{ required: true }]}>
+                <Input />
+              </Form.Item>
+              <Form.Item name="city" label="City" rules={[{ required: true }]}>
+                <Input />
+              </Form.Item>
+              <Form.Item name="note" label="Note" rules={[{ required: true }]}>
+                <Input />
+              </Form.Item>
+            </Form>
           </Col>
         </Row>
       </Modal>
