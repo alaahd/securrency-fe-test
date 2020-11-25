@@ -12,16 +12,14 @@ docker-compose down
 docker-compose down --rmi all
 ```
 
-### 2- Build all images and run containers (services)
-
-This command will Build new images, create all containers, and start all containers (Compose). (This will not rebuild images if a Dockerfile changes.)
+### 2- Build docker images and run containers (services)
 
 ```
 docker-compose up
 ```
 
-Thats it ! Congratulations, now you should have all the services up and running !
-<br/>
+#### Thats it ! you should have all services up and running !
+
 <br/>
 
 The React frontend application (Dapp) is spun up at `http://localhost:3000` and it proxies internally to the server using the linked name.
