@@ -11,7 +11,7 @@ services:
 
   nginx:
     build: ./client
-    env_file: ./client/.env.sample
+    # env_file: ./client/.env.sample
     ports:
       - 3000:3000
     networks:
