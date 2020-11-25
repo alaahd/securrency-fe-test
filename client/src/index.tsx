@@ -17,7 +17,7 @@ const REACT_APP_API_URL = process.env.REACT_APP_API_URL
 
 console.log('process.env.REACT_APP_API_URL', process.env.REACT_APP_API_URL);
 
-const FETCH_DELAY_TIME = 1000;
+const FETCH_DELAY_TIME = 500;
 const fetcher = async function <JSON = any>(
   url: RequestInfo,
   init?: RequestInit
@@ -41,6 +41,7 @@ ReactDOM.render(
       value={{
         fetcher: fetcher,
         shouldRetryOnError: false,
+        dedupingInterval: 60,
         onError: error => {
           notification.error({
             message: `API error encountered while connecting to ${REACT_APP_API_URL}`,
